@@ -3,15 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package gui;
 
 import dao.DAOAluno;
 import dao.DAOCurso;
-import java.sql.PreparedStatement;
+import dao.DAOTurma;
 import java.sql.SQLException;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import modelo.Curso;
 import modelo.Aluno;
+import modelo.Turma;
 import util.ConectorBD;
 
 /**
@@ -19,17 +21,78 @@ import util.ConectorBD;
  * @author CDI
  */
 public class CursoGUI extends javax.swing.JFrame {
-    
+
     ConectorBD conexao = new ConectorBD();
     DAOCurso daoCurso = new DAOCurso(conexao.getConexao());
     DAOAluno daoAluno = new DAOAluno(conexao.getConexao());
-    Aluno aluno; 
+    DAOTurma daoTurma = new DAOTurma(conexao.getConexao());
+    List<Curso> cursos;
+    Aluno aluno;
+    Turma turma;
     Curso curso;
+    List<Turma> turmas;
+
     /**
      * Creates new form CursoGUI
      */
     public CursoGUI() {
         initComponents();
+        iniciarTurmas();
+    }
+
+    private void iniciarTurmas() {
+
+        try {
+            turmas = daoTurma.lista();
+            int totalDeTurmas = turmas.size();
+            String[] turmasString = new String[totalDeTurmas];
+
+            for (int i = 0; i < totalDeTurmas; i++) {
+                Turma t = turmas.get(i);
+
+                Curso curso = daoCurso.consulta(t.getCurso());
+                turmasString[i] = t.getAno() + " - " + curso.getNome();
+            }
+
+            jComboBox1.setModel(new DefaultComboBoxModel(turmasString));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private int verificaIndiceDaTurma(int codigoDaTurma) {
+        int result = -1;
+
+        if (turmas != null) {
+            for (int i = 0; i < turmas.size(); i++) {
+                Turma t = turmas.get(i);
+                if (t.getCodigo() == codigoDaTurma) {
+                    result = i;
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private void inicializar() {
+        /*
+        try {
+            DAOAluno = new DAOAluno(DataBase.getConnection());
+            DAOCurso = new DAOCurso(DataBase.getConnection());
+            curso = DAOCurso.findByDescricao("");
+            for(Curso c:curso) {
+                edCurso.addItem(c.getDescricao());
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(AlunoForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        aluno = new ArrayList<>();
+        alunoTableModel = new AlunoTableModel(alunos);
+        tbAlunos.setModel(alunoTableModel);
+         */
     }
 
     /**
@@ -42,32 +105,6 @@ public class CursoGUI extends javax.swing.JFrame {
     private void initComponents() {
 
         TabbedPane = new javax.swing.JTabbedPane();
-        pPesquisar = new javax.swing.JPanel();
-        bRetrieve = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
-        lNomeRetrieve = new javax.swing.JLabel();
-        tfPesquisaCodAluno = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        lCursoRetrieve = new javax.swing.JLabel();
-        pAtualizar = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        tfCodigoAtualizadoUpdate = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        tfNomeUpdate = new javax.swing.JTextField();
-        jSeparator1 = new javax.swing.JSeparator();
-        bAtualizar = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        tfCursoUpdate = new javax.swing.JTextField();
-        tfTurmaUpdate = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        tfCodigoAtualUpdate = new javax.swing.JTextField();
-        bBuscarUdate = new javax.swing.JButton();
         pCadastroAluno = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         tfCodigoCreate = new javax.swing.JTextField();
@@ -79,267 +116,38 @@ public class CursoGUI extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
+        pPesquisar = new javax.swing.JPanel();
+        bRetrieve = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        tfPesquisaCodAluno = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTableAlunos = new javax.swing.JTable();
+        pAtualizar = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        tfCodigoAtualizadoUpdate = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        tfNomeUpdate = new javax.swing.JTextField();
+        jSeparator1 = new javax.swing.JSeparator();
+        bAtualizar = new javax.swing.JButton();
+        jLabel15 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        tfCodigoAtualUpdate = new javax.swing.JTextField();
+        bBuscarUdate = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        TabbedPane.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, null, java.awt.Color.darkGray, null, null));
         TabbedPane.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
-        pPesquisar.setBackground(new java.awt.Color(181, 181, 181));
-
-        bRetrieve.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        bRetrieve.setText("Buscar");
-        bRetrieve.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bRetrieveActionPerformed(evt);
-            }
-        });
-
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel3.setText(" Código:");
-
-        lNomeRetrieve.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-
-        tfPesquisaCodAluno.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        tfPesquisaCodAluno.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfPesquisaCodAlunoActionPerformed(evt);
-            }
-        });
-
-        jLabel8.setFont(new java.awt.Font("Tahoma", 0, 28)); // NOI18N
-        jLabel8.setText("Pesquisar Aluno por Código");
-
-        jLabel12.setText("Produced Morretto");
-
-        javax.swing.GroupLayout pPesquisarLayout = new javax.swing.GroupLayout(pPesquisar);
-        pPesquisar.setLayout(pPesquisarLayout);
-        pPesquisarLayout.setHorizontalGroup(
-            pPesquisarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pPesquisarLayout.createSequentialGroup()
-                .addGap(174, 174, 174)
-                .addComponent(jLabel8)
-                .addContainerGap(226, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pPesquisarLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel12)
-                .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pPesquisarLayout.createSequentialGroup()
-                .addGap(49, 49, 49)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 82, Short.MAX_VALUE)
-                .addGroup(pPesquisarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lNomeRetrieve, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(pPesquisarLayout.createSequentialGroup()
-                        .addComponent(tfPesquisaCodAluno, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(66, 66, 66)
-                        .addComponent(bRetrieve, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(lCursoRetrieve, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(121, 121, 121))
-        );
-        pPesquisarLayout.setVerticalGroup(
-            pPesquisarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pPesquisarLayout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(jLabel8)
-                .addGap(41, 41, 41)
-                .addGroup(pPesquisarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfPesquisaCodAluno, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bRetrieve))
-                .addGap(18, 18, 18)
-                .addComponent(lNomeRetrieve, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(lCursoRetrieve, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
-                .addComponent(jLabel12))
-        );
-
-        TabbedPane.addTab("Pesquisar", pPesquisar);
-
-        pAtualizar.setBackground(new java.awt.Color(181, 181, 181));
-
-        jPanel3.setLayout(new java.awt.GridLayout(1, 2));
-
-        jPanel4.setBackground(new java.awt.Color(181, 181, 181));
-
-        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel6.setText("Código:");
-
-        tfCodigoAtualizadoUpdate.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        tfCodigoAtualizadoUpdate.setEnabled(false);
-        tfCodigoAtualizadoUpdate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfCodigoAtualizadoUpdateActionPerformed(evt);
-            }
-        });
-
-        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel7.setText("Nome:");
-
-        tfNomeUpdate.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        tfNomeUpdate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfNomeUpdateActionPerformed(evt);
-            }
-        });
-
-        bAtualizar.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        bAtualizar.setText("Atualizar");
-        bAtualizar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bAtualizarActionPerformed(evt);
-            }
-        });
-
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel4.setText("Curso:");
-
-        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel15.setText("Turma:");
-
-        tfCursoUpdate.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        tfCursoUpdate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfCursoUpdateActionPerformed(evt);
-            }
-        });
-
-        tfTurmaUpdate.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 677, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(87, 87, 87)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(jLabel15)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addGroup(jPanel4Layout.createSequentialGroup()
-                                        .addComponent(jLabel6)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(tfCodigoAtualizadoUpdate))
-                                    .addGroup(jPanel4Layout.createSequentialGroup()
-                                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel7)
-                                            .addComponent(jLabel4))
-                                        .addGap(27, 27, 27)
-                                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(tfCursoUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(tfNomeUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(tfTurmaUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(bAtualizar)
-                                .addGap(137, 137, 137)))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(tfCodigoAtualizadoUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGap(27, 27, 27)
-                                .addComponent(bAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel7))
-                        .addGap(13, 13, 13)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel15)
-                            .addComponent(tfTurmaUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(tfNomeUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(tfCursoUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-        );
-
-        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 28)); // NOI18N
-        jLabel5.setText("Atualizar Cadastro de Aluno");
-
-        jLabel13.setText("Produced Morretto");
-
-        jLabel9.setBackground(new java.awt.Color(181, 181, 181));
-        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel9.setText("Código:");
-
-        tfCodigoAtualUpdate.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        bBuscarUdate.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        bBuscarUdate.setText("Buscar");
-        bBuscarUdate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bBuscarUdateActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pAtualizarLayout = new javax.swing.GroupLayout(pAtualizar);
-        pAtualizar.setLayout(pAtualizarLayout);
-        pAtualizarLayout.setHorizontalGroup(
-            pAtualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pAtualizarLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pAtualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pAtualizarLayout.createSequentialGroup()
-                        .addGroup(pAtualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel9)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(26, 26, 26)
-                        .addComponent(tfCodigoAtualUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(103, 103, 103)
-                        .addComponent(bBuscarUdate)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 624, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel13)
-                .addContainerGap())
-            .addGroup(pAtualizarLayout.createSequentialGroup()
-                .addGap(193, 193, 193)
-                .addComponent(jLabel5)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        pAtualizarLayout.setVerticalGroup(
-            pAtualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pAtualizarLayout.createSequentialGroup()
-                .addGap(23, 23, 23)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(pAtualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pAtualizarLayout.createSequentialGroup()
-                        .addGap(25, 219, Short.MAX_VALUE)
-                        .addComponent(jLabel13)
-                        .addContainerGap())
-                    .addGroup(pAtualizarLayout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addGroup(pAtualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel9)
-                            .addComponent(tfCodigoAtualUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(bBuscarUdate))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(20, Short.MAX_VALUE))))
-        );
-
-        TabbedPane.addTab("Atualizar", pAtualizar);
-
         pCadastroAluno.setBackground(new java.awt.Color(181, 181, 181));
+        pCadastroAluno.setPreferredSize(new java.awt.Dimension(760, 360));
 
         jPanel2.setBackground(new java.awt.Color(181, 181, 181));
         jPanel2.setLayout(new java.awt.GridLayout(2, 2));
@@ -381,9 +189,9 @@ public class CursoGUI extends javax.swing.JFrame {
         });
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel10.setText("Turma");
+        jLabel10.setText("Cód. Turma/ Curso:");
 
-        jLabel11.setFont(new java.awt.Font("Tahoma", 0, 28)); // NOI18N
+        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 28)); // NOI18N
         jLabel11.setText("Cadastrar Aluno");
 
         jLabel14.setText("Produced Morretto");
@@ -400,56 +208,296 @@ public class CursoGUI extends javax.swing.JFrame {
                     .addComponent(jLabel10))
                 .addGap(30, 30, 30)
                 .addGroup(pCadastroAlunoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pCadastroAlunoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(tfNomeCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(tfCodTurma, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
-                .addGroup(pCadastroAlunoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pCadastroAlunoLayout.createSequentialGroup()
-                        .addComponent(bCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(87, 87, 87))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pCadastroAlunoLayout.createSequentialGroup()
-                        .addComponent(jLabel14)
-                        .addContainerGap())))
-            .addGroup(pCadastroAlunoLayout.createSequentialGroup()
-                .addGap(258, 258, 258)
-                .addComponent(jLabel11)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(pCadastroAlunoLayout.createSequentialGroup()
+                        .addComponent(jLabel11)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(pCadastroAlunoLayout.createSequentialGroup()
+                        .addGroup(pCadastroAlunoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pCadastroAlunoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(tfNomeCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(tfCodTurma, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(pCadastroAlunoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pCadastroAlunoLayout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel14)
+                                .addContainerGap())
+                            .addGroup(pCadastroAlunoLayout.createSequentialGroup()
+                                .addGap(67, 67, 67)
+                                .addComponent(bCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(132, Short.MAX_VALUE))))))
         );
         pCadastroAlunoLayout.setVerticalGroup(
             pCadastroAlunoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pCadastroAlunoLayout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(jLabel11)
+                .addGap(41, 41, 41)
                 .addGroup(pCadastroAlunoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
                     .addGroup(pCadastroAlunoLayout.createSequentialGroup()
-                        .addGap(32, 32, 32)
-                        .addComponent(jLabel11)
-                        .addGap(36, 36, 36)
-                        .addGroup(pCadastroAlunoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pCadastroAlunoLayout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addGap(51, 51, 51)
-                                .addComponent(jLabel2))
-                            .addGroup(pCadastroAlunoLayout.createSequentialGroup()
-                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(tfNomeCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(50, 50, 50))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pCadastroAlunoLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(bCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(57, 57, 57)))
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(pCadastroAlunoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(tfNomeCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(bCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2))))
+                .addGap(44, 44, 44)
                 .addGroup(pCadastroAlunoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pCadastroAlunoLayout.createSequentialGroup()
                         .addGroup(pCadastroAlunoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(tfCodTurma, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel10))
-                        .addGap(0, 18, Short.MAX_VALUE))
+                        .addGap(0, 119, Short.MAX_VALUE))
                     .addComponent(jLabel14, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
 
         TabbedPane.addTab("Cadastrar Aluno", pCadastroAluno);
+
+        pPesquisar.setBackground(new java.awt.Color(181, 181, 181));
+
+        bRetrieve.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        bRetrieve.setText("Buscar");
+        bRetrieve.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bRetrieveActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel3.setText("Nome:");
+
+        tfPesquisaCodAluno.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        tfPesquisaCodAluno.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfPesquisaCodAlunoActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 25)); // NOI18N
+        jLabel8.setText("Pesquisar Aluno");
+
+        jLabel12.setText("Produced Morretto");
+
+        jTableAlunos.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, java.awt.Color.lightGray, java.awt.Color.white, null, null));
+        jTableAlunos.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jTableAlunos.setModel(new AlunosPesquisaTableModel());
+        jTableAlunos.setToolTipText("");
+        jTableAlunos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jTableAlunos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                linhaClicada(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jTableAlunos);
+
+        javax.swing.GroupLayout pPesquisarLayout = new javax.swing.GroupLayout(pPesquisar);
+        pPesquisar.setLayout(pPesquisarLayout);
+        pPesquisarLayout.setHorizontalGroup(
+            pPesquisarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pPesquisarLayout.createSequentialGroup()
+                .addGap(49, 49, 49)
+                .addGroup(pPesquisarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pPesquisarLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel12)
+                        .addContainerGap())
+                    .addGroup(pPesquisarLayout.createSequentialGroup()
+                        .addGroup(pPesquisarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 673, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(pPesquisarLayout.createSequentialGroup()
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tfPesquisaCodAluno, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(34, 34, 34)
+                                .addComponent(bRetrieve, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 89, Short.MAX_VALUE))
+                    .addGroup(pPesquisarLayout.createSequentialGroup()
+                        .addGap(270, 270, 270)
+                        .addComponent(jLabel8)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+        );
+        pPesquisarLayout.setVerticalGroup(
+            pPesquisarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pPesquisarLayout.createSequentialGroup()
+                .addGap(29, 29, 29)
+                .addComponent(jLabel8)
+                .addGap(16, 16, 16)
+                .addGroup(pPesquisarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(bRetrieve, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(pPesquisarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfPesquisaCodAluno, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(16, 16, 16)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel12)
+                .addContainerGap())
+        );
+
+        TabbedPane.addTab("Pesquisar", pPesquisar);
+
+        pAtualizar.setBackground(new java.awt.Color(181, 181, 181));
+        pAtualizar.setPreferredSize(new java.awt.Dimension(800, 386));
+
+        jPanel3.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel4.setBackground(new java.awt.Color(181, 181, 181));
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel6.setText("Código:");
+
+        tfCodigoAtualizadoUpdate.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        tfCodigoAtualizadoUpdate.setEnabled(false);
+        tfCodigoAtualizadoUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfCodigoAtualizadoUpdateActionPerformed(evt);
+            }
+        });
+
+        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel7.setText("Nome:");
+
+        tfNomeUpdate.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        tfNomeUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfNomeUpdateActionPerformed(evt);
+            }
+        });
+
+        bAtualizar.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        bAtualizar.setText("Atualizar");
+        bAtualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bAtualizarActionPerformed(evt);
+            }
+        });
+
+        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel15.setText("Turma:");
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 677, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(87, 87, 87)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(jLabel6)
+                                .addGap(18, 18, 18)
+                                .addComponent(tfCodigoAtualizadoUpdate))
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel7)
+                                    .addComponent(jLabel15))
+                                .addGap(22, 22, 22)
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(tfNomeUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(104, 104, 104)
+                        .addComponent(bAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(tfCodigoAtualizadoUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel7)
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(tfNomeUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(bAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel15)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(45, 45, 45))
+        );
+
+        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 28)); // NOI18N
+        jLabel5.setText("Atualizar Cadastro de Aluno");
+
+        jLabel13.setText("Produced Morretto");
+
+        jLabel9.setBackground(new java.awt.Color(181, 181, 181));
+        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel9.setText("Código:");
+
+        tfCodigoAtualUpdate.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        bBuscarUdate.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        bBuscarUdate.setText("Buscar");
+        bBuscarUdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bBuscarUdateActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pAtualizarLayout = new javax.swing.GroupLayout(pAtualizar);
+        pAtualizar.setLayout(pAtualizarLayout);
+        pAtualizarLayout.setHorizontalGroup(
+            pAtualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pAtualizarLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pAtualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pAtualizarLayout.createSequentialGroup()
+                        .addGroup(pAtualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel9)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(26, 26, 26)
+                        .addComponent(tfCodigoAtualUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(103, 103, 103)
+                        .addComponent(bBuscarUdate, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel13)
+                .addContainerGap())
+            .addGroup(pAtualizarLayout.createSequentialGroup()
+                .addGap(193, 193, 193)
+                .addComponent(jLabel5)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pAtualizarLayout.setVerticalGroup(
+            pAtualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pAtualizarLayout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pAtualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pAtualizarLayout.createSequentialGroup()
+                        .addGap(25, 316, Short.MAX_VALUE)
+                        .addComponent(jLabel13)
+                        .addContainerGap())
+                    .addGroup(pAtualizarLayout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(pAtualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel9)
+                            .addComponent(tfCodigoAtualUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(bBuscarUdate, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(116, Short.MAX_VALUE))))
+        );
+
+        TabbedPane.addTab("Atualizar", pAtualizar);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -459,7 +507,7 @@ public class CursoGUI extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(TabbedPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
+            .addComponent(TabbedPane, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
         pack();
@@ -477,14 +525,15 @@ public class CursoGUI extends javax.swing.JFrame {
         int codigoAluno = Integer.parseInt(tfCodigoCreate.getText());
         String nomeAluno = tfNomeCreate.getText();
         int codigoTurma = Integer.parseInt(tfCodTurma.getText());
-           
+
         try {
             daoAluno.insere(new Aluno(codigoAluno, nomeAluno, codigoTurma));
-        } catch(SQLException exc){    
+        } catch (SQLException exc) {
         }
-        
+
         tfCodigoCreate.setText("");
         tfNomeCreate.setText("");
+        tfCodTurma.setText("");
     }//GEN-LAST:event_bCreateActionPerformed
 
     private void tfNomeUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfNomeUpdateActionPerformed
@@ -492,15 +541,7 @@ public class CursoGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_tfNomeUpdateActionPerformed
 
     private void bBuscarUdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bBuscarUdateActionPerformed
-        int codigo = Integer.parseInt(tfCodigoAtualUpdate.getText());
-
-        try {
-            aluno = daoAluno.consulta(codigo);
-            
-            tfCodigoAtualizadoUpdate.setText( ((Integer)aluno.getCodigo()).toString());
-            tfNomeUpdate.setText(aluno.getNome());
-        }catch(SQLException exc){            
-        }
+        buscarAlunoParaAtualizar();
     }//GEN-LAST:event_bBuscarUdateActionPerformed
 
     private void tfCodTurmaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfCodTurmaActionPerformed
@@ -512,28 +553,46 @@ public class CursoGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_tfPesquisaCodAlunoActionPerformed
 
     private void bRetrieveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bRetrieveActionPerformed
-        int codigo = Integer.parseInt(tfPesquisaCodAluno.getText());
+
+        String termoBuscado = tfPesquisaCodAluno.getText();
 
         try {
-            aluno = daoAluno.consulta(codigo);
-            lNomeRetrieve.setText(aluno.getNome());
-        } catch(SQLException exc){
+
+            List<Aluno> alunos = daoAluno.consultaPorNome(termoBuscado);
+
+            AlunosPesquisaTableModel model = (AlunosPesquisaTableModel) jTableAlunos.getModel();
+
+            model.setAlunos(alunos);
+
+            model.fireTableDataChanged();
+
+        } catch (SQLException exc) {
+            exc.printStackTrace();
         }
     }//GEN-LAST:event_bRetrieveActionPerformed
 
     private void bAtualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAtualizarActionPerformed
-         int codigo = Integer.parseInt(tfCodigoAtualUpdate.getText());
-         aluno.setNome(tfNomeUpdate.getText());
-         curso.setCurso(tfCursoUpdate.getText());
-         turma.setTurma(tfCursoUpdate.getText());
-         aluno.setCodigo(codigo);
-         
-         try {
+
+        int codigoDoAluno = Integer.parseInt(tfCodigoAtualUpdate.getText());
+        String nomeAluno = tfNomeUpdate.getText();
+
+        int turmaSelecionada = this.jComboBox1.getSelectedIndex();
+        Turma novaTurma = turmas.get(turmaSelecionada);
+
+        int codigoNovaTurma = novaTurma.getCodigo();
+
+        Aluno aluno = new Aluno(codigoDoAluno, nomeAluno, codigoNovaTurma);
+
+        try {
             daoAluno.atualiza(aluno);
-            daoCurso.atualiza(curso);
-            daoTurma.atualiza(turma);
             
-        } catch(SQLException exc){    
+            this.tfCodigoAtualizadoUpdate.setText("");
+            this.tfNomeUpdate.setText("");
+            this.jComboBox1.setSelectedIndex(-1);
+            this.tfCodigoAtualUpdate.setText("");
+            
+        } catch (SQLException exc) {
+            exc.printStackTrace();
         }
     }//GEN-LAST:event_bAtualizarActionPerformed
 
@@ -541,9 +600,25 @@ public class CursoGUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_tfCodigoAtualizadoUpdateActionPerformed
 
-    private void tfCursoUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfCursoUpdateActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfCursoUpdateActionPerformed
+    private void linhaClicada(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_linhaClicada
+
+        int clickCount = evt.getClickCount();
+        if (clickCount == 2) {
+            AlunosPesquisaTableModel model = (AlunosPesquisaTableModel) jTableAlunos.getModel();
+            List<Aluno> alunos = model.getAlunos();
+
+            int row = jTableAlunos.getSelectedRow();
+
+            Aluno aluno = alunos.get(row);
+            // System.out.println("aluno:" + aluno.getNome());
+
+            this.TabbedPane.setSelectedIndex(2);
+            this.tfCodigoAtualUpdate.setText(aluno.getCodigo() + "");
+
+            buscarAlunoParaAtualizar();
+        }
+
+    }//GEN-LAST:event_linhaClicada
 
     /**
      * @param args the command line arguments
@@ -586,6 +661,7 @@ public class CursoGUI extends javax.swing.JFrame {
     private javax.swing.JButton bBuscarUdate;
     private javax.swing.JButton bCreate;
     private javax.swing.JButton bRetrieve;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -595,7 +671,6 @@ public class CursoGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -604,9 +679,9 @@ public class CursoGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JLabel lCursoRetrieve;
-    private javax.swing.JLabel lNomeRetrieve;
+    private javax.swing.JTable jTableAlunos;
     private javax.swing.JPanel pAtualizar;
     private javax.swing.JPanel pCadastroAluno;
     private javax.swing.JPanel pPesquisar;
@@ -614,10 +689,25 @@ public class CursoGUI extends javax.swing.JFrame {
     private javax.swing.JTextField tfCodigoAtualUpdate;
     private javax.swing.JTextField tfCodigoAtualizadoUpdate;
     private javax.swing.JTextField tfCodigoCreate;
-    private javax.swing.JTextField tfCursoUpdate;
     private javax.swing.JTextField tfNomeCreate;
     private javax.swing.JTextField tfNomeUpdate;
     private javax.swing.JTextField tfPesquisaCodAluno;
-    private javax.swing.JTextField tfTurmaUpdate;
     // End of variables declaration//GEN-END:variables
+
+    private void buscarAlunoParaAtualizar() {
+        int codigo = Integer.parseInt(tfCodigoAtualUpdate.getText());
+
+        try {
+            aluno = daoAluno.consulta(codigo);
+
+            tfCodigoAtualizadoUpdate.setText(((Integer) aluno.getCodigo()).toString());
+            tfNomeUpdate.setText(aluno.getNome());
+
+            int indiceDaTurma = verificaIndiceDaTurma(aluno.getTurma());
+
+            jComboBox1.setSelectedIndex(indiceDaTurma);
+        } catch (SQLException exc) {
+            exc.printStackTrace();
+        }
+    }
 }

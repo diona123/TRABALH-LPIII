@@ -17,7 +17,9 @@ public class DAOAluno {
             "SELECT * FROM aluno";
     private static final String SQLConsulta = 
             "SELECT nomealuno, codturma FROM aluno WHERE codaluno = ?";
-    private static final String SQLAtualiza = 
+    private static final String SQLConsultaPorNome = 
+            "SELECT * FROM aluno WHERE upper(nomealuno) like upper(?)";
+    private static final String SQLAtualiza =
             "UPDATE aluno SET nomealuno = ?, codturma = ? WHERE codaluno = ?";
     private static final String SQLRemove = 
             "DELETE FROM aluno WHERE codaluno = ?";
@@ -33,6 +35,24 @@ public class DAOAluno {
     
     public void setConnexao(Connection conexao){
         this.conexao = conexao;
+    }
+    
+    public List<Aluno> consultaPorNome(String nomeAluno) throws SQLException{
+        
+        List<Aluno> alunos = new ArrayList<>();
+        comando = conexao.prepareStatement(SQLConsultaPorNome);
+        comando.setString(1, "%" + nomeAluno + "%");
+        ResultSet resultadoConsulta = comando.executeQuery();
+        
+        while(resultadoConsulta.next()){
+            Aluno aluno = new Aluno();
+            aluno.setCodigo(resultadoConsulta.getInt("codaluno"));
+            aluno.setNome(resultadoConsulta.getString("nomealuno"));
+            aluno.setTurma(resultadoConsulta.getInt("codturma"));
+            alunos.add(aluno);
+        }
+        
+        return alunos;
     }
     
     public Aluno consulta(int codaluno) throws SQLException {
